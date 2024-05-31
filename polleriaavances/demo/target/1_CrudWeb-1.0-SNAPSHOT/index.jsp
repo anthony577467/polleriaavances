@@ -134,6 +134,7 @@
 </div>
 
 <a href="CliGetAll" class="btn btn-primary">Ir a Lista de cliente</a>
+<a href="usuarioGetAll" class="btn btn-primary">Ir a Lista de los productos</a>
 
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

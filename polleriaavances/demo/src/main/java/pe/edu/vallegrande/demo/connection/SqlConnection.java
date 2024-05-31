@@ -6,9 +6,9 @@ import java.sql.SQLException;
 
 public class SqlConnection {
 
-    private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=CRUDPOLLERIA;encrypt=false;trustServerCertificate=true;";
+    private static final String URL = "jdbc:sqlserver://localhost:14033;databaseName=CRUDPOLLERIA;encrypt=false;trustServerCertificate=true;";
     private static final String USER = "SA";
-    private static final String PASSWORD = "SQL#12345";
+    private static final String PASSWORD = "aldair123";
 
 
     public static Connection getConnection() throws SQLException {
