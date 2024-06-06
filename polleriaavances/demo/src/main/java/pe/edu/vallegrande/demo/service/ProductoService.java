@@ -21,9 +21,7 @@ public class ProductoService {
                 bean.setId(rs.getInt("ID"));
                 bean.setNombre(rs.getString("nombre"));
                 bean.setDescripcion(rs.getString("descripcion"));
-                // Obtener el precio como BigDecimal
                 BigDecimal precio = rs.getBigDecimal("precio");
-                // Verificar si el valor del precio es nulo antes de asignarlo
                 if (precio != null) {
                     bean.setPrecio(precio);
                 }
@@ -33,22 +31,16 @@ public class ProductoService {
                 lista.add(bean);
             }
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Error al obtener todos los productos: " + e.getMessage(), e);
         }
         return lista;
     }
 
     public ProductoDTO createProd(ProductoDTO bean) {
-        Connection cn = null;
-        PreparedStatement pstm;
-        ResultSet rs;
-        String sql;
-        int id;
-        sql = "INSERT INTO producto (nombre, descripcion, precio, categoria, imagen, estado) VALUES (?, ?, ?, ?, ?, ?)";
-        try {
-            cn = SqlConnection.getConnection();
+        String sql = "INSERT INTO producto (nombre, descripcion, precio, categoria, imagen, estado) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection cn = SqlConnection.getConnection();
+             PreparedStatement pstm = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             cn.setAutoCommit(false);
-            pstm = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             pstm.setString(1, bean.getNombre());
             pstm.setString(2, bean.getDescripcion());
             pstm.setBigDecimal(3, bean.getPrecio());
@@ -58,34 +50,22 @@ public class ProductoService {
 
             int rows = pstm.executeUpdate();
             if (rows > 0) {
-                rs = pstm.getGeneratedKeys();
-                if (rs.next()) {
-                    id = rs.getInt(1);
-                    bean.setId(id);
-                    System.out.println("El id es " + id);
+                try (ResultSet rs = pstm.getGeneratedKeys()) {
+                    if (rs.next()) {
+                        bean.setId(rs.getInt(1));
+                        System.out.println("El id es " + rs.getInt(1));
+                    }
                 }
             }
-
-            pstm.close();
             cn.commit();
-
         } catch (SQLException e) {
-            if (cn != null) {
-                try {
-                    cn.rollback();
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                }
+            e.printStackTrace();
+            try (Connection cn = SqlConnection.getConnection()) {
+                cn.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
             }
-            throw new RuntimeException(e.getMessage(), e);
-        } finally {
-            try {
-                if (cn != null) {
-                    cn.close();
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e.getMessage());
-            }
+            throw new RuntimeException("Error al crear el producto: " + e.getMessage(), e);
         }
         return bean;
     }
@@ -101,34 +81,33 @@ public class ProductoService {
                     producto.setId(rs.getInt("ID"));
                     producto.setNombre(rs.getString("nombre"));
                     producto.setDescripcion(rs.getString("descripcion"));
-                    producto.setPrecio(rs.getBigDecimal("precio")); // Obtener el precio como BigDecimal
+                    producto.setPrecio(rs.getBigDecimal("precio"));
                     producto.setCategoria(rs.getString("categoria"));
                     producto.setImagen(rs.getString("imagen"));
                     producto.setEstado(rs.getString("estado"));
                 }
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener el producto por ID: " + e.getMessage());
+            throw new RuntimeException("Error al obtener el producto por ID: " + e.getMessage(), e);
         }
         return producto;
     }
 
     public void updateProd(ProductoDTO producto) {
+        String sql = "UPDATE producto SET Nombre = ?, Descripcion = ?, Precio = ?, categoria = ?, imagen = ?, estado = ? WHERE ID = ?";
         try (Connection conn = SqlConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("UPDATE producto SET Nombre = ?, Descripcion = ?, Precio = ?, categoria = ?, imagen = ?, estado = ? WHERE ID = ?")) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, producto.getNombre());
             pstmt.setString(2, producto.getDescripcion());
-            // Definir el precio como BigDecimal y establecer la precisión y la escala
             BigDecimal precio = new BigDecimal(String.valueOf(producto.getPrecio())).setScale(2, RoundingMode.HALF_UP);
             pstmt.setBigDecimal(3, precio);
             pstmt.setString(4, producto.getCategoria());
             pstmt.setString(5, producto.getImagen());
             pstmt.setString(6, producto.getEstado());
             pstmt.setInt(7, producto.getId());
-
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error al actualizar el producto: " + e.getMessage(), e);
         }
     }
 
@@ -142,14 +121,14 @@ public class ProductoService {
                 bean.setId(rs.getInt("ID"));
                 bean.setNombre(rs.getString("nombre"));
                 bean.setDescripcion(rs.getString("descripcion"));
-                bean.setPrecio(rs.getBigDecimal("precio")); // Obtener el precio como BigDecimal
+                bean.setPrecio(rs.getBigDecimal("precio"));
                 bean.setCategoria(rs.getString("categoria"));
                 bean.setImagen(rs.getString("imagen"));
                 bean.setEstado(rs.getString("estado"));
                 lista.add(bean);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener los productos activos: " + e.getMessage());
+            throw new RuntimeException("Error al obtener los productos activos: " + e.getMessage(), e);
         }
         return lista;
     }
@@ -164,35 +143,49 @@ public class ProductoService {
                 bean.setId(rs.getInt("ID"));
                 bean.setNombre(rs.getString("nombre"));
                 bean.setDescripcion(rs.getString("descripcion"));
-                bean.setPrecio(rs.getBigDecimal("precio")); // Obtener el precio como BigDecimal
+                bean.setPrecio(rs.getBigDecimal("precio"));
                 bean.setCategoria(rs.getString("categoria"));
                 bean.setImagen(rs.getString("imagen"));
                 bean.setEstado(rs.getString("estado"));
                 lista.add(bean);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error al obtener los productos inactivos: " + e.getMessage());
+            throw new RuntimeException("Error al obtener los productos inactivos: " + e.getMessage(), e);
         }
         return lista;
     }
 
-    public void deleteProd(int id) {
+    public void deleteProdLog(int id) {
+        String sql = "UPDATE producto SET estado = 'inactivo' WHERE id = ?";
         try (Connection conn = SqlConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("UPDATE producto SET estado = 'inactivo' WHERE id = ?")) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setInt(1, id);
+            int rowsAffected = pstmt.executeUpdate();
+            System.out.println("Rows affected: " + rowsAffected);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al eliminar el producto lógicamente: " + e.getMessage(), e);
+        }
+    }
+
+    public void deletePoductoFis(int id) {
+        String sql = "DELETE FROM producto WHERE id = ?";
+        try (Connection conn = SqlConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Error al eliminar el producto físicamente: " + e.getMessage(), e);
         }
     }
 
     public void restaurarProd(int id) {
+        String sql = "UPDATE producto SET estado = 'activo' WHERE id = ?";
         try (Connection conn = SqlConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement("UPDATE producto SET estado = 'activo' WHERE id = ?")) {
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setInt(1, id);
             pstmt.executeUpdate();
         } catch (SQLException e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Error al restaurar el producto: " + e.getMessage(), e);
         }
     }
 

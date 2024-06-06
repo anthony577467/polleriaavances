@@ -4,6 +4,60 @@
     <meta charset="UTF-8">
     <title>Productos</title>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1f1c2c, #928DAB);
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+        }
+        .centered-form {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 0;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+        }
+        .card-title {
+            font-size: 2rem;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .form-control {
+            background: transparent;
+            border: 1px solid #ffffff;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+            border-color: #ffffff;
+        }
+        .form-check-label {
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #5A54E8;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #837DFF;
+        }
+        .error-message {
+            font-size: 0.9rem;
+        }
+    </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Agregar event listeners para validación en tiempo real
@@ -78,7 +132,7 @@
             }
         }
 
-        function validateForm() {
+        function validateForm(event) {
             validateNombre();
             validateDescripcion();
             validatePrecio();
@@ -101,7 +155,7 @@
                 // Si hay errores de validación, mostrar el mensaje de error
                 formError.style.display = "block";
                 // Detener el envío del formulario
-                event.preventDefault(); // Agregar esta línea para detener el envío del formulario
+                event.preventDefault();
                 return false;
             } else {
                 // Si no hay errores de validación, ocultar el mensaje de error y permitir el envío del formulario
@@ -126,28 +180,25 @@
                 <li class="nav-item">
                     <a class="nav-link" href="historial">Historial</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="home">Home</a>
-                </li>
             </ul>
         </div>
     </div>
 </nav>
 
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <h2 class="text-center">Registro de Producto</h2>
-            <form id="formulario" onsubmit="return validateForm()" action="contProcesar" method="post">
+<div class="container centered-form">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title">Registro de Producto</h2>
+            <form id="formulario" onsubmit="return validateForm(event)" action="contProcesar" method="post">
                 <div class="form-group">
                     <label for="nombre"><i class="fas fa-user"></i> Nombre:</label>
                     <input type="text" class="form-control" id="nombre" name="nombre" maxlength="30" required>
-                    <div id="nombre-error" class="invalid-feedback" style="display: none;"></div>
+                    <div id="nombre-error" class="invalid-feedback error-message text-danger" style="display: none;"></div>
                 </div>
                 <div class="form-group">
                     <label for="descripcion"><i class="fas fa-info-circle"></i> Descripcion:</label>
                     <textarea class="form-control" id="descripcion" name="descripcion" rows="4" maxlength="60" required></textarea>
-                    <div id="descripcion-error" class="invalid-feedback" style="display: none;"></div>
+                    <div id="descripcion-error" class="invalid-feedback error-message text-danger" style="display: none;"></div>
                 </div>
                 <div class="form-group">
                     <label for="precio"><i class="fas fa-dollar-sign"></i> Precio:</label>
@@ -157,30 +208,24 @@
                         </div>
                         <input type="number" class="form-control" id="precio" name="precio" min="0" step="0.01" required>
                     </div>
-                    <div id="precio-error" class="invalid-feedback" style="display: none;"></div>
+                    <div id="precio-error" class="invalid-feedback error-message text-danger" style="display: none;"></div>
                 </div>
                 <div class="form-group">
                     <label for="categoria"><i class="fas fa-list"></i> Categoria:</label>
                     <select class="form-control" id="categoria" name="categoria" required>
                         <option value="">Seleccione una categoria</option>
-                        <option value="comida">Comida</option>
-                        <option value="bebidas">Bebidas</option>
+                        <option value="moda">comida</option>
+                        <option value="hogar">bebida</option>
                     </select>
-                    <div id="categoria-error" class="invalid-feedback" style="display: none;"></div>
+                    <div id="categoria-error" class="invalid-feedback error-message text-danger" style="display: none;"></div>
                 </div>
                 <div class="form-group">
-                    <label for="imagen"><i class="fas fa-image"></i> Imagen:</label>
-                    <input type="text" class="form-control" id="imagen" name="imagen" required>
-                    <div id="imagen-error" class="invalid-feedback" style="display: none;"></div>
+                    <label for="imagen"><i class="fas fa-image"></i> URL de la Imagen:</label>
+                    <input type="url" class="form-control" id="imagen" name="imagen" required>
+                    <div id="imagen-error" class="invalid-feedback error-message text-danger" style="display: none;"></div>
                 </div>
-                <div class="form-group">
-                    <label for="estado"><i class="fas fa-flag"></i> Estado:</label>
-                    <select class="form-control" id="estado" name="estado" required disabled>
-                        <option value="activo">Activo</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i>Registrar</button>
-                <div id="form-error" class="alert alert-danger" style="display: none; margin-top: 30px;">Por favor, corrija los errores en el formulario.</div>
+                <button type="submit" class="btn btn-primary btn-block">Registrar</button>
+                <div id="form-error" class="alert alert-danger mt-3" style="display: none;">Por favor, corrija los errores en el formulario.</div>
             </form>
         </div>
     </div>
@@ -188,7 +233,7 @@
 
 <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

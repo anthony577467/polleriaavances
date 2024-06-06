@@ -207,6 +207,7 @@ public class ClienteController extends HttpServlet {
         }
     }
 
+
     protected void cliDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int id = Integer.parseInt(req.getParameter("id"));
         ClienteService service = new ClienteService();

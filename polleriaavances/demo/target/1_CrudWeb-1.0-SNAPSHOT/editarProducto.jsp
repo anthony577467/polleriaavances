@@ -6,88 +6,87 @@
     <title>Editar Usuario</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <style>
-        @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap");
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: "Open Sans", sans-serif;
-        }
         body {
+            background: linear-gradient(135deg, #1f1c2c, #928DAB);
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+        }
+        .centered-form {
             display: flex;
-            align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            width: 100%;
-            padding: 0 10px;
-            background: url("https://www.codingnepalweb.com/demos/create-glassmorphism-login-form-html-css/hero-bg.jpg"), #000;
-            background-position: center;
-            background-size: cover;
+            align-items: center;
+            height: 100vh;
         }
         .wrapper {
-            width: 600px;
-            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 15px;
             padding: 30px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.5);
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        form {
-            display: flex;
-            flex-direction: column;
         }
         h2 {
             font-size: 2rem;
+            text-align: center;
             margin-bottom: 20px;
-            color: #fff;
         }
         .input-field {
             position: relative;
-            border-bottom: 2px solid #ccc;
-            margin: 15px 0;
+            margin-bottom: 15px;
         }
         .input-field label {
             position: absolute;
-            top: -10px; /* Ajusta la posición para que el label permanezca arriba */
+            top: -10px;
             left: 0;
             color: #fff;
             font-size: 16px;
             pointer-events: none;
-            transition: none; /* Elimina la transición */
+            transition: none;
         }
-        .input-field input {
+        .input-field input,
+        .input-field select {
             width: 100%;
             height: 40px;
             background: transparent;
             border: none;
+            border-bottom: 2px solid #ccc;
             outline: none;
             font-size: 16px;
             color: #fff;
         }
+        .input-field input:focus,
+        .input-field select:focus {
+            border-bottom: 2px solid #fff;
+        }
         .input-field input:focus~label,
-        .input-field input:valid~label {
+        .input-field select:focus~label,
+        .input-field input:valid~label,
+        .input-field select:valid~label {
             font-size: 0.8rem;
-            top: -10px; /* Mantiene el label arriba sin transición */
-            transform: translateY(0); /* Asegura que el label permanezca en la posición correcta */
+            top: -10px;
+            transform: translateY(0);
         }
         .btn-primary {
-            background: #fff;
-            color: #000;
-            font-weight: 600;
+            background-color: #5A54E8;
             border: none;
-            padding: 12px 20px;
-            cursor: pointer;
-            border-radius: 3px;
-            font-size: 16px;
-            border: 2px solid transparent;
-            transition: 0.3s ease;
+            transition: background-color 0.3s ease;
+            width: 100%;
         }
         .btn-primary:hover {
-            color: #fff;
-            border-color: #fff;
-            background: rgba(255, 255, 255, 0.15);
+            background-color: #837DFF;
+        }
+        .invalid-feedback {
+            font-size: 0.9rem;
+            color: #ffcccc;
+            display: none;
+        }
+        .alert {
+            font-size: 0.9rem;
+            color: #ffcccc;
+            display: none;
         }
     </style>
     <script>
@@ -205,45 +204,55 @@
     </script>
 </head>
 <body>
-<div class="wrapper">
-    <form id="formulario" action="contActualizar" method="post" onsubmit="return validateForm(event)">
-        <h2>Editar Producto</h2>
-        <input type="hidden" name="accion" value="actualizar">
-        <input type="hidden" name="id" value="${usuario.id}">
-        <div class="input-field">
-            <input type="text" id="nombre" name="nombre" value="${usuario.nombre}" maxlength="30" required>
-            <label for="nombre">Nombre</label>
-        </div>
-        <div id="nombre-error" class="invalid-feedback" style="display: none;"></div>
+<div class="centered-form">
+    <div class="wrapper">
+        <form id="formulario" action="contActualizar" method="post" onsubmit="return validateForm(event)">
+            <h2>Editar Producto</h2>
+            <input type="hidden" name="accion" value="actualizar">
+            <input type="hidden" name="id" value="${usuario.id}">
+            <div class="input-field">
+                <input type="text" id="nombre" name="nombre" value="${usuario.nombre}" maxlength="30" required>
+                <label for="nombre">Nombre</label>
+                <div id="nombre-error" class="invalid-feedback"></div>
+            </div>
 
-        <div class="input-field">
-            <input type="text" id="descripcion" name="descripcion" value="${usuario.descripcion}" maxlength="60" required>
-            <label for="descripcion">Descripción</label>
-        </div>
-        <div id="descripcion-error" class="invalid-feedback" style="display: none;"></div>
+            <div class="input-field">
+                <input type="text" id="descripcion" name="descripcion" value="${usuario.descripcion}" maxlength="60" required>
+                <label for="descripcion">Descripción</label>
+                <div id="descripcion-error" class="invalid-feedback"></div>
+            </div>
 
-        <div class="input-field">
-            <input type="text" id="precio" name="precio" value="${usuario.precio}" maxlength="30" required>
-            <label for="precio">Precio</label>
-        </div>
-        <div id="precio-error" class="invalid-feedback" style="display: none;"></div>
-        <div class="input-field">
-            <input type="text" id="categoria" name="categoria" value="${usuario.categoria}" maxlength="60" required>
-            <label for="categoria">Categoria</label>
-        </div>
-        <div id="categoria-error" class="invalid-feedback" style="display: none;"></div>
-        <div class="input-field">
-            <input type="text" id="imagen" name="imagen" value="${usuario.imagen}" required>
-            <label for="imagen">imagen</label>
-        </div>
-        <div id="imagen-error" class="invalid-feedback" style="display: none;"></div>
-        <div class="input-field">
-            <input type="text" id="estado" name="estado" value="${usuario.estado}" readonly>
-            <label for="estado">Estado</label>
-        </div>
-        <button type="submit" class="btn-primary">Actualizar</button>
-        <div id="form-error" class="alert alert-danger" style="display: none; margin-top: 10px;">Por favor, corrija los errores en el formulario.</div>
-    </form>
+            <div class="input-field">
+                <input type="text" id="precio" name="precio" value="${usuario.precio}" maxlength="30" required>
+                <label for="precio">Precio</label>
+                <div id="precio-error" class="invalid-feedback"></div>
+            </div>
+
+            <div class="input-field">
+                <select id="categoria" name="categoria" required>
+                    <option value="" disabled selected>Selecciona una categoría</option>
+                    <option value="Bebidas" ${usuario.categoria == 'Bebidas' ? 'selected' : ''}>Bebidas</option>
+                    <option value="Comida" ${usuario.categoria == 'Comida' ? 'selected' : ''}>Comida</option>
+                </select>
+                <label for="categoria">Categoría</label>
+                <div id="categoria-error" class="invalid-feedback"></div>
+            </div>
+
+            <div class="input-field">
+                <input type="text" id="imagen" name="imagen" value="${usuario.imagen}" required>
+                <label for="imagen">Imagen</label>
+                <div id="imagen-error" class="invalid-feedback"></div>
+            </div>
+
+            <div class="input-field">
+                <input type="text" id="estado" name="estado" value="${usuario.estado}" readonly>
+                <label for="estado">Estado</label>
+            </div>
+
+            <button type="submit" class="btn-primary">Actualizar</button>
+            <div id="form-error" class="alert alert-danger" style="display: none;">Por favor, corrige los errores en el formulario.</div>
+        </form>
+    </div>
 </div>
 </body>
 </html>

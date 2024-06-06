@@ -93,7 +93,7 @@
         <a class="nav-link" href="index.jsp">Inicio</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link" href="#menu">Menú</a>
+        <a class="nav-link" href="menu">Menú</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="galeria.jsp">Galería</a>
