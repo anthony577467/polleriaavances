@@ -1,13 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="pe.edu.vallegrande.demo.dto.ClienteDTO" %>
 <%@ page import="pe.edu.vallegrande.demo.dto.CartDTO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.math.BigDecimal" %>
 <%
     List<CartDTO> cart = (List<CartDTO>) session.getAttribute("cart");
     BigDecimal igv = new BigDecimal("0.18"); // IGV del 18%
-    // Obtener el correo electrónico del usuario de la sesión
-    String userEmail = (String) session.getAttribute("userEmail");
+    ClienteDTO cliente = (ClienteDTO) session.getAttribute("cliente");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,9 +21,14 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 <body>
-<div class="container mt-5">
+<div class="container mt-5" style="display:none;">
     <h2>Perfil de Usuario</h2>
-    <p><strong>Correo Electrónico:</strong> <%= userEmail %></p>
+    <p><strong>Correo Electrónico:</strong> <%= cliente != null ? cliente.getCorreo() : "" %></p>
+    <p><strong>Nombre:</strong> <%= cliente != null ? cliente.getNombres() : "" %></p>
+    <p><strong>Apellidos:</strong> <%= cliente != null ? cliente.getApellidos() : "" %></p>
+    <p><strong>DNI o Carnet:</strong> <%= cliente != null ? cliente.getDniocarnet() : "" %></p>
+    <p><strong>Teléfono:</strong> <%= cliente != null ? cliente.getTelefono() : "" %></p>
+    <p><strong>Dirección:</strong> <%= cliente != null ? cliente.getDireccion() : "" %></p>
 </div>
 <div class="container mt-5">
     <h1>Carrito de Compras</h1>
@@ -37,7 +42,6 @@
         </tr>
         </thead>
         <tbody>
-        <%-- Lógica para mostrar los productos en el carrito --%>
         <% if (cart != null) {
             BigDecimal total = BigDecimal.ZERO;
             for (CartDTO item : cart) {
@@ -51,7 +55,6 @@
             <td>S/ <%= itemTotal.setScale(2, BigDecimal.ROUND_HALF_UP) %></td>
         </tr>
         <% }
-            // Calcular el IGV y sumarlo al total
             BigDecimal totalConIGV = total.add(total.multiply(igv)).setScale(2, BigDecimal.ROUND_HALF_UP);
         %>
         <tr>
@@ -73,32 +76,68 @@
         <% } %>
         </tbody>
     </table>
+    <%
+        if (cliente != null) {
+    %>
     <button id="descargar-pdf" class="btn btn-primary">Descargar PDF</button>
-    <a href="login.jsp" class="btn btn-info">Iniciar Sesión</a> <!-- Botón para redirigir a la página de inicio de sesión -->
+    <%
+    } else {
+    %>
+    <a href="login.jsp" class="btn btn-info">Iniciar Sesión</a>
+    <%
+        }
+    %>
 </div>
+
+<%
+    if (cliente != null) {
+%>
+<div id="hidden-client-data"
+     data-correo="<%= cliente.getCorreo() %>"
+     data-nombres="<%= cliente.getNombres() %>"
+     data-apellidos="<%= cliente.getApellidos() %>"
+     data-dniocarnet="<%= cliente.getDniocarnet() %>"
+     data-telefono="<%= cliente.getTelefono() %>"
+     data-direccion="<%= cliente.getDireccion() %>"
+     style="display:none;"></div>
+<%
+    }
+%>
 
 <script>
     document.getElementById('descargar-pdf').addEventListener('click', function() {
         const { jsPDF } = window.jspdf;
-
         const doc = new jsPDF();
+
+        // Título
+        doc.setFontSize(18);
         doc.text("Boleta de Compra", 10, 10);
 
-        // Obtener los datos del usuario
-        const userEmail = "<%= userEmail %>";
+        // Datos del cliente
+        doc.setFontSize(12);
+        const clientData = document.getElementById('hidden-client-data');
+        const cliente = {
+            correo: clientData ? clientData.getAttribute('data-correo') : '',
+            nombres: clientData ? clientData.getAttribute('data-nombres') : '',
+            apellidos: clientData ? clientData.getAttribute('data-apellidos') : '',
+            dniocarnet: clientData ? clientData.getAttribute('data-dniocarnet') : '',
+            telefono: clientData ? clientData.getAttribute('data-telefono') : '',
+            direccion: clientData ? clientData.getAttribute('data-direccion') : ''
+        };
 
-        // Agregar los datos del usuario al PDF
-        doc.text("Usuario: " + userEmail, 10, 20);
+        doc.text(`Correo Electrónico: ${cliente.correo}`, 10, 30);
+        doc.text(`Nombre: ${cliente.nombres}`, 10, 40);
+        doc.text(`Apellidos: ${cliente.apellidos}`, 10, 50);
+        doc.text(`DNI o Carnet: ${cliente.dniocarnet}`, 10, 60);
+        doc.text(`Teléfono: ${cliente.telefono}`, 10, 70);
+        doc.text(`Dirección: ${cliente.direccion}`, 10, 80);
 
-        // Definir las columnas de la tabla
+        // Datos del carrito
         const columns = ["Producto", "Precio", "Cantidad", "Total"];
-
-        // Obtener los datos de la tabla HTML
         const data = [];
         document.querySelectorAll('table tbody tr').forEach(row => {
             const rowData = [];
             row.querySelectorAll('td').forEach((cell, index) => {
-                // Solo agregar el contenido de las celdas que no son el total
                 if (index < 4) {
                     rowData.push(cell.innerText);
                 }
@@ -108,23 +147,34 @@
             }
         });
 
-        // Generar la tabla en el PDF
         doc.autoTable({
             head: [columns],
             body: data,
-            startY: 40
+            startY: 90, // Ajustar la posición de inicio de la tabla
+            theme: 'striped',
+            styles: {
+                fontSize: 10,
+                cellPadding: 2,
+                overflow: 'linebreak'
+            },
+            headStyles: {
+                fillColor: [22, 160, 133],
+                textColor: 255,
+                fontStyle: 'bold'
+            },
+            bodyStyles: {
+                fillColor: [216, 216, 216]
+            },
+            alternateRowStyles: {
+                fillColor: [240, 240, 240]
+            },
+            margin: { top: 90 }
         });
 
-        // Guardar el PDF con un nombre específico
-        doc.save('boleta_compra.pdf');
-
-        // Mostrar un mensaje de éxito al usuario
-        Swal.fire({
-            icon: 'success',
-            title: 'Descarga completa',
-            text: 'El PDF se ha descargado correctamente.'
-        });
+        // Guardar el PDF
+        doc.save("boleta_compra.pdf");
     });
 </script>
+
 </body>
 </html>
