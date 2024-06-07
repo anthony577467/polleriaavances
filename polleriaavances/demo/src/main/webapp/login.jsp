@@ -11,14 +11,14 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-body">
-                    <h3 class="card-title text-center">Iniciar sesión</h3>
+                    <h3 class="card-title text-center">Iniciar sesion</h3>
                     <form action="LoginServlet" method="post">
                         <div class="form-group">
-                            <label for="email">Correo electrónico (Gmail):</label>
+                            <label for="email">Correo electronico (Gmail):</label>
                             <input type="email" id="email" name="email" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="password">Contraseña:</label>
+                            <label for="password">clave:</label>
                             <input type="password" id="password" name="password" class="form-control" required>
                         </div>
                         <button type="submit" class="btn btn-primary btn-block">Iniciar sesión</button>

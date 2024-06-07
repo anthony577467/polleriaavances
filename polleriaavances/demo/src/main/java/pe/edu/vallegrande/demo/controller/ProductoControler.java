@@ -218,8 +218,21 @@ public class ProductoControler extends HttpServlet {
                     cart = new ArrayList<>();
                 }
 
-                // Añadir el artículo al carrito
-                cart.add(new CartDTO(id, nombre, precio, cantidad));
+                // Verificar si el producto ya está en el carrito
+                boolean productExists = false;
+                for (CartDTO item : cart) {
+                    if (item.getId() == id) {
+                        item.setCantidad(item.getCantidad() + cantidad); // Actualizar la cantidad
+                        productExists = true;
+                        break;
+                    }
+                }
+
+                if (!productExists) {
+                    // Añadir el nuevo producto al carrito
+                    cart.add(new CartDTO(id, nombre, precio, cantidad));
+                }
+
                 session.setAttribute("cart", cart);
 
                 System.out.println("Added item to cart: " + nombre);
@@ -231,6 +244,7 @@ public class ProductoControler extends HttpServlet {
             }
         }
     }
+
 
     public void destroy() {
     }

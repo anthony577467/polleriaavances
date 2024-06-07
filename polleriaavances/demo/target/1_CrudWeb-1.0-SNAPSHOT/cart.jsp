@@ -3,11 +3,29 @@
 <%@ page import="pe.edu.vallegrande.demo.dto.ClienteDTO" %>
 <%@ page import="pe.edu.vallegrande.demo.dto.CartDTO" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 <%@ page import="java.math.BigDecimal" %>
 <%
     List<CartDTO> cart = (List<CartDTO>) session.getAttribute("cart");
     BigDecimal igv = new BigDecimal("0.18"); // IGV del 18%
     ClienteDTO cliente = (ClienteDTO) session.getAttribute("cliente");
+
+    // Mapa para agrupar los elementos del carrito por su ID
+    Map<Integer, CartDTO> groupedCart = new HashMap<>();
+    if (cart != null) {
+        for (CartDTO item : cart) {
+            if (groupedCart.containsKey(item.getId())) {
+                // Si el producto ya existe en el mapa, actualizar la cantidad
+                CartDTO existingItem = groupedCart.get(item.getId());
+                existingItem.setCantidad(existingItem.getCantidad() + item.getCantidad());
+            } else {
+                // Si el producto no existe en el mapa, agregarlo
+                groupedCart.put(item.getId(), item);
+            }
+        }
+    }
+
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -42,9 +60,9 @@
         </tr>
         </thead>
         <tbody>
-        <% if (cart != null) {
+        <%
             BigDecimal total = BigDecimal.ZERO;
-            for (CartDTO item : cart) {
+            for (CartDTO item : groupedCart.values()) {
                 BigDecimal itemTotal = item.getPrecio().multiply(new BigDecimal(item.getCantidad()));
                 total = total.add(itemTotal);
         %>
@@ -69,17 +87,12 @@
             <td colspan="3" class="text-right">Total</td>
             <td>S/ <%= totalConIGV %></td>
         </tr>
-        <% } else { %>
-        <tr>
-            <td colspan="4" class="text-center">El carrito está vacío</td>
-        </tr>
-        <% } %>
         </tbody>
     </table>
     <%
         if (cliente != null) {
     %>
-    <button id="descargar-pdf" class="btn btn-primary">Descargar PDF</button>
+    <button id="descargar-pdf" class="btn btn-primary">Comprar Productos</button>
     <%
     } else {
     %>
