@@ -1,10 +1,3 @@
-<%--
-  Created by IntelliJ IDEA.
-  User: User
-  Date: 18/05/2024
-  Time: 09:13
-  To change this template use File | Settings | File Templates.
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -21,8 +14,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: calc(200vh - 200px); /* Reduce la altura del contenedor */
-            padding: 50px 0; /* Añade padding para alejar el formulario del centro */
+            height: calc(200vh - 200px);
+            padding: 50px 0;
         }
         .card {
             background: rgba(255, 255, 255, 0.1);
@@ -73,10 +66,10 @@
 
             if (dniOption.checked) {
                 dniocarnetInput.maxLength = 8;
-                dniocarnetInput.value = dniocarnetInput.value.slice(0, 8); // Limitar el valor actual si excede 8 caracteres
+                dniocarnetInput.value = dniocarnetInput.value.slice(0, 8);
             } else if (carnetOption.checked) {
                 dniocarnetInput.maxLength = 20;
-                dniocarnetInput.value = dniocarnetInput.value.slice(0, 20); // Limitar el valor actual si excede 20 caracteres
+                dniocarnetInput.value = dniocarnetInput.value.slice(0, 20);
             }
         }
 
@@ -88,10 +81,8 @@
             dniOption.addEventListener('change', updateDocumentLength);
             carnetOption.addEventListener('change', updateDocumentLength);
 
-            // Inicializar la longitud del documento cuando la página se carga
             updateDocumentLength();
 
-            // Añadir eventos de validación en tiempo real
             inputs.forEach(input => {
                 input.addEventListener('input', validateField);
                 input.addEventListener('blur', validateField);
@@ -131,7 +122,7 @@
 <div class="container centered-form">
     <div class="card">
         <div class="card-body">
-            <h1 class="card-title">Crear Nuevo Cliente</h1>
+            <h1 class="card-title">Registrarse</h1>
             <form id="crearClienteForm" action="CliCrear" method="post" novalidate>
                 <div class="form-group">
                     <label for="nombresInput">Nombres:</label>
@@ -184,6 +175,16 @@
                     <span class="error-message text-danger"></span>
                 </div>
                 <div class="form-group">
+                    <label for="clave">Contraseña</label>
+                    <input type="password" id="clave" name="clave" class="form-control" required>
+                    <span class="error-message text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label for="rol">Rol:</label>
+                    <input type="text" id="rol" name="rol" class="form-control" required>
+                    <span class="error-message text-danger"></span>
+                </div>
+                <div class="form-group">
                     <label for="fechaNacimientoInput">Fecha de Cumpleaños:</label>
                     <input type="date" id="fechaNacimientoInput" name="fechaNacimiento" class="form-control" required>
                     <span class="error-message text-danger"></span>
@@ -191,7 +192,6 @@
                 <button id="crearClienteButton" type="submit" class="btn btn-primary">Crear</button>
             </form>
             <script>
-                // Calcula la fecha máxima permitida (18 años atrás desde hoy)
                 var today = new Date();
                 var eighteenYearsAgo = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
                 var maxDate = eighteenYearsAgo.toISOString().split('T')[0];

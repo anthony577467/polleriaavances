@@ -13,9 +13,14 @@ CREATE TABLE cliente_M (
     direccion NVARCHAR(255),
     ubigeo NVARCHAR(6) ,
     fechaNacimiento DATE ,
+    clave NVARCHAR(90),
+    rol CHAR(10) DEFAULT 'CLIENTE',
     activo BIT  DEFAULT 1
 );
 GO
+
+SELECT * from cliente_M;
+
 
 CREATE TABLE producto (
     id INT PRIMARY KEY IDENTITY(1,1),

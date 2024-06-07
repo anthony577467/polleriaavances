@@ -99,6 +99,8 @@ public class ClienteController extends HttpServlet {
         String correo = req.getParameter("correo");
         String direccion = req.getParameter("direccion");
         String ubigeo = req.getParameter("ubigeo");
+        String clave = req.getParameter("clave"); // Nuevo campo
+        String rol = req.getParameter("rol"); // Nuevo campo
         String fechaNacimiento = req.getParameter("fechaNacimiento");
 
         if (nombres != null && !nombres.isEmpty() &&
@@ -108,7 +110,9 @@ public class ClienteController extends HttpServlet {
                 telefono != null && !telefono.isEmpty() &&
                 correo != null && !correo.isEmpty() &&
                 ubigeo != null && !ubigeo.isEmpty() &&
-                fechaNacimiento != null && !fechaNacimiento.isEmpty()) {
+                fechaNacimiento != null && !fechaNacimiento.isEmpty() &&
+                clave != null && !clave.isEmpty() && // Validación para clave
+                rol != null && !rol.isEmpty()) { // Validación para rol
 
             ClienteDTO nuevoCliente = new ClienteDTO();
             nuevoCliente.setNombres(nombres);
@@ -120,12 +124,14 @@ public class ClienteController extends HttpServlet {
             nuevoCliente.setDireccion(direccion);
             nuevoCliente.setUbigeo(ubigeo);
             nuevoCliente.setFechaNacimiento(fechaNacimiento);
+            nuevoCliente.setClave(clave); // Establecer clave
+            nuevoCliente.setRol(rol); // Establecer rol
 
             ClienteService service = new ClienteService();
             int nuevoClienteId = service.create(nuevoCliente);
 
             if (nuevoClienteId != 0) {
-                String redirectURL = req.getContextPath() + "/CliGetId?id=" + nuevoClienteId;
+                String redirectURL = req.getContextPath() + "getAll" + nuevoClienteId;
                 resp.sendRedirect(redirectURL);
             } else {
                 String mensaje = "Error al crear el nuevo cliente";
@@ -154,6 +160,7 @@ public class ClienteController extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/index.jsp?mensaje=" + URLEncoder.encode(mensaje, "UTF-8"));
         }
     }
+
     private void updateStatusToActive(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         int id = Integer.parseInt(req.getParameter("id"));
 
@@ -181,6 +188,8 @@ public class ClienteController extends HttpServlet {
         String direccion = req.getParameter("direccion");
         String ubigeo = req.getParameter("ubigeo");
         String fechaNacimiento = req.getParameter("fechaNacimiento");
+        String clave = req.getParameter("clave"); // Nuevo campo
+        String rol = req.getParameter("rol"); // Nuevo campo
         String activo = req.getParameter("activo");
 
         ClienteService service = new ClienteService();
@@ -196,6 +205,8 @@ public class ClienteController extends HttpServlet {
             cliente.setDireccion(direccion);
             cliente.setUbigeo(ubigeo);
             cliente.setFechaNacimiento(fechaNacimiento);
+            cliente.setClave(clave); // Actualizar clave
+            cliente.setRol(rol); // Actualizar rol
             cliente.setActivo(activo);
             service.update(cliente);
 
@@ -206,6 +217,7 @@ public class ClienteController extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/index.jsp?mensaje=" + URLEncoder.encode(mensaje, "UTF-8"));
         }
     }
+
 
 
     protected void cliDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

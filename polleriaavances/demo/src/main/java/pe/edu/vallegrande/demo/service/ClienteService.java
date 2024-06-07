@@ -17,7 +17,7 @@ public class ClienteService {
 
         try {
             cn = SqlConnection.getConnection();
-            sql = "SELECT id, nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, activo FROM cliente_M WHERE activo = 1";
+            sql = "SELECT id, nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, clave, rol, activo FROM cliente_M WHERE activo = 1";
             pstm = cn.prepareStatement(sql);
             rs = pstm.executeQuery();
             while (rs.next()) {
@@ -32,6 +32,8 @@ public class ClienteService {
                 bean.setDireccion(rs.getString("direccion"));
                 bean.setUbigeo(rs.getString("ubigeo"));
                 bean.setFechaNacimiento(rs.getString("fechaNacimiento"));
+                bean.setClave(rs.getString("clave"));
+                bean.setRol(rs.getString("rol"));
                 bean.setActivo(rs.getString("activo"));
                 lista.add(bean);
             }
@@ -58,7 +60,7 @@ public class ClienteService {
 
         try {
             cn = SqlConnection.getConnection();
-            sql = "SELECT id, nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, activo FROM cliente_M WHERE activo = 0";
+            sql = "SELECT id, nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, clave, rol, activo FROM cliente_M WHERE activo = 0";
             pstm = cn.prepareStatement(sql);
             rs = pstm.executeQuery();
             while (rs.next()) {
@@ -73,6 +75,8 @@ public class ClienteService {
                 bean.setDireccion(rs.getString("direccion"));
                 bean.setUbigeo(rs.getString("ubigeo"));
                 bean.setFechaNacimiento(rs.getString("fechaNacimiento"));
+                bean.setClave(rs.getString("clave"));
+                bean.setRol(rs.getString("rol"));
                 bean.setActivo(rs.getString("activo"));
                 lista.add(bean);
             }
@@ -99,7 +103,7 @@ public class ClienteService {
 
         try {
             cn = SqlConnection.getConnection();
-            sql = "SELECT id, nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, activo FROM cliente_M WHERE id = ?";
+            sql = "SELECT id, nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, clave, rol, activo FROM cliente_M WHERE id = ?";
             pstm = cn.prepareStatement(sql);
             pstm.setInt(1, id);
             rs = pstm.executeQuery();
@@ -115,6 +119,8 @@ public class ClienteService {
                 bean.setDireccion(rs.getString("direccion"));
                 bean.setUbigeo(rs.getString("ubigeo"));
                 bean.setFechaNacimiento(rs.getString("fechaNacimiento"));
+                bean.setClave(rs.getString("clave"));
+                bean.setRol(rs.getString("rol"));
                 bean.setActivo(rs.getString("activo"));
             }
         } catch (SQLException e) {
@@ -140,7 +146,7 @@ public class ClienteService {
 
         try {
             cn = SqlConnection.getConnection();
-            sql = "INSERT INTO cliente_M (nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            sql = "INSERT INTO cliente_M (nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, clave, rol, fechaNacimiento, activo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             pstm = cn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             pstm.setString(1, bean.getNombres());
             pstm.setString(2, bean.getApellidos());
@@ -150,8 +156,10 @@ public class ClienteService {
             pstm.setString(6, bean.getCorreo());
             pstm.setString(7, bean.getDireccion());
             pstm.setString(8, bean.getUbigeo());
-            pstm.setString(9, bean.getFechaNacimiento());
-            pstm.setString(10, "1"); // Set activo to 1 by default
+            pstm.setString(9, bean.getClave());
+            pstm.setString(10, bean.getRol());
+            pstm.setString(11, bean.getFechaNacimiento());
+            pstm.setString(12, "1"); // Set activo to 1 by default
 
             pstm.executeUpdate();
 
@@ -267,4 +275,51 @@ public class ClienteService {
             }
         }
     }
+
+    // En la clase ClienteService
+
+    public ClienteDTO getByEmail(String email) {
+        ClienteDTO cliente = null;
+        Connection cn = null;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
+        String sql;
+
+        try {
+            cn = SqlConnection.getConnection();
+            sql = "SELECT id, nombres, apellidos, tipoDocumento, dniocarnet, telefono, correo, direccion, ubigeo, fechaNacimiento, clave, rol, activo FROM cliente_M WHERE correo = ?";
+            pstm = cn.prepareStatement(sql);
+            pstm.setString(1, email);
+            rs = pstm.executeQuery();
+            if (rs.next()) {
+                cliente = new ClienteDTO();
+                cliente.setId(rs.getInt("id"));
+                cliente.setNombres(rs.getString("nombres"));
+                cliente.setApellidos(rs.getString("apellidos"));
+                cliente.setTipoDocumento(rs.getString("tipoDocumento"));
+                cliente.setDniocarnet(rs.getString("dniocarnet"));
+                cliente.setTelefono(rs.getString("telefono"));
+                cliente.setCorreo(rs.getString("correo"));
+                cliente.setDireccion(rs.getString("direccion"));
+                cliente.setUbigeo(rs.getString("ubigeo"));
+                cliente.setFechaNacimiento(rs.getString("fechaNacimiento"));
+                cliente.setClave(rs.getString("clave"));
+                cliente.setRol(rs.getString("rol"));
+                cliente.setActivo(rs.getString("activo"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (pstm != null) pstm.close();
+                if (cn != null) cn.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return cliente;
+    }
+
+
 }

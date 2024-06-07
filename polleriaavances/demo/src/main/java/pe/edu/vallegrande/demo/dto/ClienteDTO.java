@@ -17,5 +17,7 @@ public class ClienteDTO {
     private String direccion;
     private String ubigeo;
     private String fechaNacimiento; // Nuevo campo
+    private String clave;
+    private String rol;
     private String activo;
 }

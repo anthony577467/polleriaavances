@@ -109,6 +109,8 @@
                         <th>Dirección</th>
                         <th>Ubigeo</th>
                         <th>Fecha de Cumpleaños</th>
+                        <th>Clave</th>
+                        <th>Rol</th>
                         <th>Acciones</th>
                     </tr>
                     </thead>
@@ -125,6 +127,8 @@
                             <td>${cliente.direccion}</td>
                             <td>${cliente.ubigeo}</td>
                             <td>${cliente.fechaNacimiento}</td>
+                            <td>${cliente.clave}</td>
+                            <td>${cliente.rol}</td>
                             <td class="text-center">
                                 <a href="CliEditar?id=${cliente.id}" class="btn btn-primary">Actualizar</a>
                                 <form action="CliBorrar" method="post" style="display: inline;" onsubmit="mostrarAlerta()">
@@ -154,4 +158,3 @@
 </script>
 </body>
 </html>
-

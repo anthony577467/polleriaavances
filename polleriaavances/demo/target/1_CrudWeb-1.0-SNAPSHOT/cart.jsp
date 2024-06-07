@@ -6,6 +6,8 @@
 <%
     List<CartDTO> cart = (List<CartDTO>) session.getAttribute("cart");
     BigDecimal igv = new BigDecimal("0.18"); // IGV del 18%
+    // Obtener el correo electrónico del usuario de la sesión
+    String userEmail = (String) session.getAttribute("userEmail");
 %>
 <!DOCTYPE html>
 <html lang="es">
@@ -19,7 +21,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 </head>
 <body>
-
+<div class="container mt-5">
+    <h2>Perfil de Usuario</h2>
+    <p><strong>Correo Electrónico:</strong> <%= userEmail %></p>
+</div>
 <div class="container mt-5">
     <h1>Carrito de Compras</h1>
     <table class="table table-bordered">
@@ -32,12 +37,12 @@
         </tr>
         </thead>
         <tbody>
-        <%
-            if (cart != null) {
-                BigDecimal total = BigDecimal.ZERO;
-                for (CartDTO item : cart) {
-                    BigDecimal itemTotal = item.getPrecio().multiply(new BigDecimal(item.getCantidad()));
-                    total = total.add(itemTotal);
+        <%-- Lógica para mostrar los productos en el carrito --%>
+        <% if (cart != null) {
+            BigDecimal total = BigDecimal.ZERO;
+            for (CartDTO item : cart) {
+                BigDecimal itemTotal = item.getPrecio().multiply(new BigDecimal(item.getCantidad()));
+                total = total.add(itemTotal);
         %>
         <tr>
             <td><%= item.getNombre() %></td>
@@ -45,8 +50,7 @@
             <td><%= item.getCantidad() %></td>
             <td>S/ <%= itemTotal.setScale(2, BigDecimal.ROUND_HALF_UP) %></td>
         </tr>
-        <%
-            }
+        <% }
             // Calcular el IGV y sumarlo al total
             BigDecimal totalConIGV = total.add(total.multiply(igv)).setScale(2, BigDecimal.ROUND_HALF_UP);
         %>
@@ -62,18 +66,15 @@
             <td colspan="3" class="text-right">Total</td>
             <td>S/ <%= totalConIGV %></td>
         </tr>
-        <%
-        } else {
-        %>
+        <% } else { %>
         <tr>
             <td colspan="4" class="text-center">El carrito está vacío</td>
         </tr>
-        <%
-            }
-        %>
+        <% } %>
         </tbody>
     </table>
     <button id="descargar-pdf" class="btn btn-primary">Descargar PDF</button>
+    <a href="login.jsp" class="btn btn-info">Iniciar Sesión</a> <!-- Botón para redirigir a la página de inicio de sesión -->
 </div>
 
 <script>
@@ -82,6 +83,12 @@
 
         const doc = new jsPDF();
         doc.text("Boleta de Compra", 10, 10);
+
+        // Obtener los datos del usuario
+        const userEmail = "<%= userEmail %>";
+
+        // Agregar los datos del usuario al PDF
+        doc.text("Usuario: " + userEmail, 10, 20);
 
         // Definir las columnas de la tabla
         const columns = ["Producto", "Precio", "Cantidad", "Total"];
@@ -105,7 +112,7 @@
         doc.autoTable({
             head: [columns],
             body: data,
-            startY: 20
+            startY: 40
         });
 
         // Guardar el PDF con un nombre específico
